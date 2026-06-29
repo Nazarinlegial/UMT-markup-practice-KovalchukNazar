@@ -4,7 +4,7 @@
 
 ## Live repo
 
-https://github.com/Nazarinlegial/UMT-markup-practice-KovalchukNazar
+[https://nazarinlegial.github.io/UMT-markup-practice-KovalchukNazar/](https://nazarinlegial.github.io/UMT-markup-practice-KovalchukNazar/)
 
 ## Design source (Figma)
 
