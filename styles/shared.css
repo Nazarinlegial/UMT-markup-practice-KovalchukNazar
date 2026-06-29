@@ -1,0 +1,276 @@
+/* ================================ */
+/* Shared infra: loaders, notifications, pagination overrides */
+/* ================================ */
+
+/* Loader */
+
+.content-loader {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	min-height: 160px;
+	width: 100%;
+}
+
+.content-loader[hidden] {
+	display: none !important;
+}
+
+.content-loader__spinner {
+	box-sizing: border-box;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	border: 3px solid rgba(3, 12, 1, 0.12);
+	border-top-color: var(--button-gradient-end, #42ed13);
+	animation: content-loader-spin 0.75s linear infinite;
+}
+
+@keyframes content-loader-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.content-loader__spinner {
+		animation: content-loader-pulse 1.2s ease-in-out infinite;
+	}
+
+	@keyframes content-loader-pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+
+		50% {
+			opacity: 0.45;
+		}
+	}
+}
+
+/* Notifications */
+
+#notification-root {
+	position: fixed;
+	inset: 16px 16px auto auto;
+	z-index: 10000;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	pointer-events: none;
+	max-width: min(360px, 90vw);
+}
+
+.notification {
+	pointer-events: auto;
+	padding: 12px 16px;
+	border-radius: 8px;
+	font-size: var(--font-regular);
+	color: var(--primary-text);
+	background-color: var(--primary-bg);
+	border: 1px solid var(--border-color, #030c01);
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+}
+
+.notification--error {
+	border-color: #d64545;
+}
+
+/* ================================ */
+/* Bouquets — drop the hardcoded grid heights so 100 items can flow */
+/* ================================ */
+
+.bouquets-list-shell {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 24px;
+	width: 100%;
+}
+
+.bouquets-list-shell #bouquets-list:empty {
+	display: none;
+}
+
+/* End-of-collection message — shown once Show More has loaded the last
+   chunk. Matches the section's body copy size and stays muted so it reads
+   as a status note, not a feature. */
+.bouquets-end-message {
+	margin-top: 16px;
+	font-size: var(--font-regular);
+	line-height: 150%;
+	color: var(--primary-text);
+	opacity: 0.6;
+	text-align: center;
+}
+
+.bouquets-end-message[hidden] {
+	display: none;
+}
+
+/* `display: inline-flex` on .primary-button overrides the browser-default
+   [hidden] { display: none } rule. Bring the default back so toggling the
+   `hidden` attribute on Show More (and any other primary button) works. */
+.primary-button[hidden] {
+	display: none !important;
+}
+
+/* Override the static-height grids from styles.css — those were sized
+   for exactly 8 cards. The API-backed catalogue can render any count.
+   On mobile rows auto-fit (Figma has variable 419/440 px there); on
+   tablet/desktop the row height is pinned to the Figma spec so the
+   layout doesn't drift when Show More appends more cards. */
+.bouquets-list {
+	height: auto !important;
+	overflow: visible !important;
+	grid-template-rows: none !important;
+}
+
+/* Equal-height cards: every .bouquets-item stretches to its grid row,
+   .product-card fills it, and the price gets pinned to the bottom of
+   .product-card-content so all four prices in a row align horizontally
+   even when their descriptions are different lengths. */
+.bouquets-item {
+	align-self: stretch;
+}
+
+.bouquets-item .product-card {
+	height: 100%;
+}
+
+/* Lock the bouquet image to its design size — without this the flex
+   layout shrinks it when the card content (long descriptions) tries to
+   take more space than the grid row allows. */
+.bouquets-item .bouquets-card-image {
+	flex-shrink: 0;
+}
+
+/* On mobile each row stacks naturally — keep the content flowing right
+   after the image with no extra empty space. On tablet/desktop several
+   cards share a row and may have different description lengths, so we
+   stretch content + pin price to the bottom so all four prices align. */
+@media (min-width: 768px) {
+	.bouquets-item .product-card-content {
+		flex: 1;
+		justify-content: space-between;
+	}
+
+	.bouquets-item .product-card-price {
+		margin-top: auto;
+	}
+}
+
+/* Reserve exactly two lines of text height for every bestsellers card so
+   short descriptions don't pull the price up — keeps prices on a single
+   baseline across the row without touching the Figma layout. */
+.bestsellers-item .product-card-text {
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+	min-height: calc(1.5em * 2);
+}
+
+/* Figma title height differs per breakpoint — mobile 103, tablet 76, the
+   same on desktop. styles.css only sets the mobile value, so tablet+
+   inherit it (and section ends up 27 px taller than the Figma spec).
+   Reset to the Figma value from 768 up. */
+@media (min-width: 768px) {
+	.bouquets-title {
+		height: 76px;
+	}
+}
+
+@media (min-width: 1440px) {
+	.bouquets-title {
+		height: 93px;
+	}
+}
+
+/* ================================ */
+/* Bestsellers + feedback — custom pagination dots                  */
+/* The dot list is rendered dynamically; mark active dot via JS by  */
+/* toggling .is-active on the parent <li>. The legacy CSS rule      */
+/* `.bestsellers-dots li:first-child .bestsellers-dot { opacity: 1 }` */
+/* would always highlight the first dot — we neutralise it so the    */
+/* active-class rule wins.                                           */
+/* ================================ */
+
+.bestsellers-dots li .bestsellers-dot {
+	opacity: 0.2;
+}
+
+.bestsellers-dots li.is-active .bestsellers-dot {
+	opacity: 1;
+}
+
+.bestsellers-dots li {
+	cursor: pointer;
+}
+
+.bestsellers-controls .slider-nav-button:disabled,
+.feedback-nav .slider-nav-button:disabled {
+	opacity: 0.2;
+	cursor: not-allowed;
+}
+
+/* Mobile testimonial cards have no fixed height in styles.css — different
+   quote lengths produce different card sizes. Lock to the Figma spec so
+   every card is 335 × 228 (tablet/desktop already have 228 set). */
+@media (max-width: 767px) {
+	.feedback-item {
+		height: 228px;
+		min-height: 228px;
+		max-height: 228px;
+		overflow: hidden;
+	}
+}
+
+/* Long quotes can push the author below the fixed 228 px card height on
+   any breakpoint. Clamp the quote to 3 lines everywhere so the author
+   always stays inside the card and the layout stays consistent. */
+.feedback-item .feedback-quote-text {
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+/* Pin the author to the bottom of the card regardless of how long the
+   quote ends up — keeps every author on the same baseline (matches the
+   Figma testimonial layout). */
+.feedback-author {
+	margin-top: auto;
+}
+
+/* ================================ */
+/* Click cooldown                                                   */
+/* ================================ */
+/* `.click-cooldown` is added by js/button-cooldown.js right after a
+   click. While it's present we neutralise the lingering hover/focus
+   visual change (CSS keeps :hover until the pointer moves off, plus
+   the browser may keep :focus-visible after a mouse click). Native
+   :active feedback during mousedown is left alone — only the
+   afterwards-sticky styles are reset. */
+
+.primary-button.click-cooldown:hover,
+.primary-button.click-cooldown:focus,
+.primary-button.click-cooldown:focus-visible {
+	opacity: 1;
+}
+
+.slider-nav-button.click-cooldown:hover,
+.slider-nav-button.click-cooldown:focus,
+.slider-nav-button.click-cooldown:focus-visible {
+	background-color: var(--slider-arrow-bg);
+	border-color: var(--border-color-subtle);
+}
+
+/* Keep dynamically rendered feedback cards from collapsing when only
+   one is present at the mobile breakpoint — the legacy nth-child
+   display:none rules are scoped to additional children, so a single
+   card always shows. Nothing to override here, but document the
+   assumption for future maintenance. */
