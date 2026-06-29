@@ -22,6 +22,22 @@
 			rel="stylesheet"
 		/>
 
+		<!-- Preload hero bg picture for LCP -->
+		<link
+				rel="preload"
+				as="image"
+				href="./images/hero-bg@1x.jpg"
+				media="(-webkit-max-device-pixel-ratio: 1.99), (max-resolution: 191dpi)"
+				fetchpriority="high"
+		/>
+		<link
+				rel="preload"
+				as="image"
+				href="./images/hero-bg@2x.jpg"
+				media="(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)"
+				fetchpriority="high"
+		/>
+
 		<!-- Fetch the hero photo early to speed up LCP -->
 		<link rel="preload" as="image" href="./images/hero-bg.jpg" fetchpriority="high" />
 
@@ -129,7 +145,8 @@
 					<img
 						loading="lazy"
 						class="about-image"
-						src="./images/about-florist.jpg"
+						src="./images/about-florist@1x.jpg"
+						srcset="./images/about-florist@2x.jpg 2x"
 						alt="Female florist arranging white peony flowers in a shop"
 						data-aos="fade-left"
 					/>
@@ -150,7 +167,8 @@
 									<img
 										loading="lazy"
 										class="bestsellers-card-image"
-										src="./images/spring-elegance.jpg"
+										src="./images/spring-elegance@1x.jpg"
+										srcset="./images/spring-elegance@2x.jpg 2x"
 										alt="Spring Elegance bouquet — a woman holding a beautiful spring flower bouquet"
 									/>
 									<div class="product-card-content">
@@ -171,7 +189,8 @@
 									<img
 										loading="lazy"
 										class="bestsellers-card-image"
-										src="./images/berry-chic.jpg"
+										src="./images/berry-chic@1x.jpg"
+										srcset="./images/berry-chic@2x.jpg 2x"
 										alt="Berry Chic bouquet — bridal arrangement with roses and berries"
 									/>
 									<div class="product-card-content">
@@ -192,7 +211,8 @@
 									<img
 										loading="lazy"
 										class="bestsellers-card-image"
-										src="./images/lavender-dream.jpg"
+										src="./images/lavender-dream@1x.jpg"
+										srcset="./images/lavender-dream@2x.jpg 2x"
 										alt="Lavender Dream bouquet — mixed flowers on a wooden table"
 									/>
 									<div class="product-card-content">
@@ -250,7 +270,8 @@
 								<img
 									loading="lazy"
 									class="bouquets-card-image"
-									src="./images/peach-meadow.jpg"
+									src="./images/peach-meadow@1x.jpg"
+									srcset="./images/peach-meadow@2x.jpg 2x"
 									alt="Peach Meadow — soft arrangement of peach and blush roses in a straw basket"
 								/>
 								<div class="product-card-content">
@@ -271,7 +292,8 @@
 								<img
 									loading="lazy"
 									class="bouquets-card-image"
-									src="./images/blush-romance.jpg"
+									src="./images/blush-romance@1x.jpg"
+									srcset="./images/blush-romance@2x.jpg 2x"
 									alt="Blush Romance — deep pink and ivory roses with silver eucalyptus"
 								/>
 								<div class="product-card-content">
@@ -292,7 +314,8 @@
 								<img
 									loading="lazy"
 									class="bouquets-card-image"
-									src="./images/pastel-garden.jpg"
+									src="./images/pastel-garden@1x.jpg"
+									srcset="./images/pastel-garden@2x.jpg 2x"
 									alt="Pastel Garden — pastel-toned spray roses and greenery in a woven basket"
 								/>
 								<div class="product-card-content">
@@ -313,7 +336,8 @@
 								<img
 									loading="lazy"
 									class="bouquets-card-image"
-									src="./images/tulip-charm.jpg"
+									src="./images/tulip-charm@1x.jpg"
+									srcset="./images/tulip-charm@2x.jpg 2x"
 									alt="Tulip Charm — bright tulips and roses in a lavender box"
 								/>
 								<div class="product-card-content">
@@ -333,7 +357,8 @@
 								<img
 									loading="lazy"
 									class="bouquets-card-image"
-									src="./images/berry-bloom.jpg"
+									src="./images/berry-bloom@1x.jpg"
+									srcset="./images/berry-bloom@2x.jpg 2x"
 									alt="Berry Bloom — rich pink, purple, and cream blooms with textured greens"
 								/>
 								<div class="product-card-content">
@@ -353,7 +378,8 @@
 								<img
 									loading="lazy"
 									class="bouquets-card-image"
-									src="./images/sweet-whisper.jpg"
+									src="./images/sweet-whisper@1x.jpg"
+									srcset="./images/sweet-whisper@2x.jpg 2x"
 									alt="Sweet Whisper — spring bouquet with peonies, roses and lilac accents"
 								/>
 								<div class="product-card-content">
@@ -374,7 +400,8 @@
 								<img
 									loading="lazy"
 									class="bouquets-card-image"
-									src="./images/field-joy.jpg"
+									src="./images/field-joy@1x.jpg"
+									srcset="./images/field-joy@2x.jpg 2x"
 									alt="Field Joy — rustic bouquet of sunflowers, lisianthus and daisies"
 								/>
 								<div class="product-card-content">
@@ -395,7 +422,8 @@
 								<img
 									loading="lazy"
 									class="bouquets-card-image"
-									src="./images/soft-bloom.jpg"
+									src="./images/soft-bloom@1x.jpg"
+									srcset="./images/soft-bloom@2x.jpg 2x"
 									alt="Soft Bloom — pink carnations and roses wrapped in satin paper"
 								/>
 								<div class="product-card-content">
@@ -505,7 +533,8 @@
 					<img
 						loading="lazy"
 						class="contacts-image"
-						src="./images/contact-florist.jpg"
+						src="./images/contact-florist@1x.jpg"
+						srcset="./images/contact-florist@2x.jpg 2x"
 						alt="Florist holding beautiful flowers in a flower shop"
 					/>
 				</div>
