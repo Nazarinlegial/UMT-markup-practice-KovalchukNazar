@@ -1,0 +1,32 @@
+:root {
+	/* Base type ramp on mobile — these are the values actually in use */
+	--font-small: 12px;
+	--font-regular: 14px;
+	--font-medium: 16px;
+	--font-price: 18px;
+	--font-heading: 32px;
+	--font-hero-title: 36px;
+
+	/* Sizes that never change between breakpoints (buttons, burger links) */
+	--font-button: 16px;
+	--font-menu-link: 16px;
+	--font-heading-section: 34px;
+	--font-subtitle: 18px;
+	--font-author: 16px;
+
+	/* Lookup table — tablet/desktop overrides live in the @media blocks of styles.css */
+	--font-heading-mobile: 32px;
+	--font-small-tablet: 14px;
+	--font-regular-tablet: 16px;
+	--font-medium-tablet: 18px;
+	--font-price-tablet: 20px;
+	--font-heading-tablet: 40px;
+	--font-hero-title-tablet: 48px;
+
+	--font-small-desktop: 14px;
+	--font-regular-desktop: 16px;
+	--font-medium-desktop: 18px;
+	--font-price-desktop: 20px;
+	--font-heading-desktop: 48px;
+	--font-hero-title-desktop: 56px;
+}

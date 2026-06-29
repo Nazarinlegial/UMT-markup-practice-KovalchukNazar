@@ -1,0 +1,26 @@
+:root {
+	--primary-text: #030c01;
+	--primary-bg: #ffffff;
+	--footer-bg: #eeee60;
+
+	/* Backdrop tint of the slide-out drawer */
+	--mobile-menu-bg: #ffffff;
+
+	/* Primary CTA button — gradient plus the pressed state */
+	--button-gradient-start: #e8e81c;
+	--button-gradient-end: #42ed13;
+	--button-clicked-bg: #4e544d;
+	--button-clicked-text: #ffffff;
+
+	/* Round slider arrow controls */
+	--slider-arrow-bg: #ffffff;
+	--slider-arrow-hover-bg: #d9fbcf;
+	--slider-arrow-active-bg: #7af259;
+
+	/* Solid colour behind the hero photo, in case the image fails to load */
+	--hero-fallback-bg: #d9d9d9;
+
+	/* Hairlines and dividers */
+	--border-color: #030c01;
+	--border-color-subtle: #030c0126;
+}
