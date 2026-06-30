@@ -42,19 +42,23 @@ function buildBouquetsListItemShellMarkup() {
 
 function fillBouquetsListItem(listItem, product) {
 	const image = listItem.querySelector(".bouquets-card-image");
-	const img2x = resolveImageUrl(product.img2x);
-	if (img2x) {
-		image.setAttribute("srcset", `${img2x} 2x`);
+	const photo2x = resolveImageUrl(product.photoURL2x);
+	if (photo2x) {
+		image.setAttribute("srcset", `${photo2x} 2x`);
 	}
-	image.src = resolveImageUrl(product.img);
+	image.src = resolveImageUrl(product.photoURL);
 	image.alt = product.alt ?? product.title ?? "";
 
 	listItem.querySelector(".product-card-title").textContent = product.title ?? "";
-	listItem.querySelector(".product-card-text").textContent = product.desc ?? "";
+	listItem.querySelector(".product-card-text").textContent = product.description ?? "";
 	listItem.querySelector(".product-card-price").textContent = formatPriceUsd(product.price);
 
-	if (product.descLong) {
-		listItem.querySelector(".product-card").dataset.descLong = product.descLong;
+	const card = listItem.querySelector(".product-card");
+	if (product.id != null) {
+		card.dataset.bouquetId = String(product.id);
+	}
+	if (product.descriptionLong) {
+		card.dataset.descLong = product.descriptionLong;
 	}
 }
 
@@ -97,16 +101,15 @@ async function fetchPage(page) {
 		return slice;
 	}
 
-	const response = await apiClient.get("/products", {
-		params: { _page: page, _per_page: state.perPage },
+	const response = await apiClient.get("/bouquets", {
+		params: { page, perPage: state.perPage },
 	});
 	const data = response.data;
 
-	// json-server v1 pagination envelope:
-	//   { first, prev, next, last, pages, items: <count of all records>, data: [...] }
-	// Here `items` holds the total record count and the page slice lives in `data`.
+	// Flora backend pagination envelope:
+	//   { data: [...], meta: { page, perPage, total, totalPages, hasNextPage, hasPrevPage } }
 	if (data && Array.isArray(data.data)) {
-		state.hasMore = data.next != null;
+		state.hasMore = data.meta?.hasNextPage === true;
 		return data.data;
 	}
 

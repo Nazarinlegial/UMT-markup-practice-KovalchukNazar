@@ -47,19 +47,23 @@ function fillItem(li, product) {
 	const image = li.querySelector(".bestsellers-card-image");
 	// Assign srcset before src so the browser locks onto the correct DPR
 	// candidate straight away instead of pulling both @1x and @2x.
-	const img2x = resolveImageUrl(product.img2x);
-	if (img2x) {
-		image.setAttribute("srcset", `${img2x} 2x`);
+	const photo2x = resolveImageUrl(product.photoURL2x);
+	if (photo2x) {
+		image.setAttribute("srcset", `${photo2x} 2x`);
 	}
-	image.src = resolveImageUrl(product.img);
+	image.src = resolveImageUrl(product.photoURL);
 	image.alt = product.alt ?? product.title ?? "";
 
 	li.querySelector(".product-card-title").textContent = product.title ?? "";
-	li.querySelector(".product-card-text").textContent = product.desc ?? "";
+	li.querySelector(".product-card-text").textContent = product.description ?? "";
 	li.querySelector(".product-card-price").textContent = formatPriceUsd(product.price);
 
-	if (product.descLong) {
-		li.querySelector(".product-card").dataset.descLong = product.descLong;
+	const card = li.querySelector(".product-card");
+	if (product.id != null) {
+		card.dataset.bouquetId = String(product.id);
+	}
+	if (product.descriptionLong) {
+		card.dataset.descLong = product.descriptionLong;
 	}
 }
 
@@ -167,7 +171,7 @@ async function boot() {
 	}
 
 	try {
-		const response = await apiClient.get("/bestsellers");
+		const response = await apiClient.get("/bouquets/favorites");
 		const data = response.data;
 		allItems = Array.isArray(data) ? data : (data?.data ?? []);
 		currentPage = 0;

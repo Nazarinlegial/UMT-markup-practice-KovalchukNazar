@@ -10,9 +10,9 @@ const base =
 	isGitHubActions && repo && !isUserOrOrgSite ? `/${repo}/` : "/";
 
 const jsonServerTarget = "http://127.0.0.1:4001";
-// In static mode the catalogue reads pre-built dist/api/*.json files. Proxying
-// `/api/*` to a local json-server would shadow those static files, so we skip
-// the proxy entirely whenever VITE_API_MODE=static.
+// In static mode the catalogue reads the pre-built dist/api/*.json files, so
+// proxying `/api/*` to a local json-server would shadow them — that's why the
+// proxy is skipped entirely whenever VITE_API_MODE=static.
 const isStaticApiMode = process.env.VITE_API_MODE === "static";
 
 function stripApiPrefix(prefix) {
@@ -39,9 +39,10 @@ if (!isStaticApiMode) {
 	}
 }
 
-// Build-time emitter that splits db.json into per-collection static JSON files
-// under dist/api/. Used by the static-API mode that powers GitHub Pages until
-// the real backend exists. Each top-level array in db.json becomes one file:
+// Build-time emitter that breaks db.json into one static JSON file per
+// collection under dist/api/. It backs the static-API mode that runs GitHub
+// Pages until the real backend is ready. Each top-level array in db.json maps
+// to a file:
 //   db.json => { products: [...], feedbacks: [...] }
 //   => dist/api/products.json, dist/api/feedbacks.json
 function staticJsonServerEmitter({ source = "db.json", outDir = "api" } = {}) {
@@ -69,30 +70,32 @@ function staticJsonServerEmitter({ source = "db.json", outDir = "api" } = {}) {
 export default defineConfig({
 	base,
 	build: {
-		// Pin esbuild's CSS target to a browser old enough that it WON'T rewrite
+		// Pin esbuild's CSS target to an old enough browser that it WON'T rewrite
 		// `@media (min-resolution: 192dpi)` into the CSS Media Queries Level 4
-		// range syntax `(resolution>=192dpi)`. The jigsaw W3C CSS3 validator
-		// rejects the range form, even though every modern browser supports it.
+		// range form `(resolution>=192dpi)`. The jigsaw W3C CSS3 validator rejects
+		// the range form, even though every modern browser supports it.
 		cssTarget: ["chrome89", "firefox89", "edge89", "safari14"],
 	},
 	plugins: [
 		staticJsonServerEmitter(),
-		// Keep images/ in the project root (uni assignment requires it) but
-		// still ship them into dist/ on build. In dev Vite serves them as
-		// static files automatically.
+		// Keep images/ in the project root (the uni assignment requires it) yet
+		// still ship them into dist/ at build time. In dev Vite serves them as
+		// static files on its own.
 		viteStaticCopy({
-			// src points at the folder itself (not files) and dest is the
-			// dist-root — that gives dist/images/* without a nested folder.
+			// src targets the folder itself (not individual files) and dest is the dist
+			// root, yielding dist/images/* with no nested folder.
 			targets: [{ src: "images", dest: "" }],
 		}),
 	],
 	server: {
 		port: 4000,
 		proxy: {
+			// Forward "/api/*" to the Flora backend verbatim — its routes live under
+			// "/api/v1/...". Keeping the prefix keeps the browser same-origin, so
+			// there's no CORS in dev.
 			"/api": {
 				target: "http://localhost:4001",
 				changeOrigin: true,
-				rewrite: (path) => path.replace(/^\/api/, ""),
 			},
 		},
 	},

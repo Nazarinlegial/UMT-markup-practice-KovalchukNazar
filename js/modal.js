@@ -2,6 +2,10 @@
 /* Modal controller — Order form + Product details */
 /* ================================ */
 
+import { apiClient } from "./apiClient.js";
+import { showErrorNotification, showSuccessNotification } from "./notifications.js";
+import { extractErrorMessage } from "./utils.js";
+
 const FOCUSABLE_SELECTOR = [
 	"a[href]",
 	"button:not([disabled])",
@@ -24,6 +28,10 @@ const orderFormRef = document.getElementById("order-form");
 
 let lastFocusedElement = null;
 let activeModal = null;
+// The bouquet currently open in the product modal — carried into the order so
+// it ties the order to that bouquet (plus the quantity chosen there).
+let selectedBouquetId = null;
+let selectedQuantity = 1;
 
 function getFocusable(modalRef) {
 	return Array.from(modalRef.querySelectorAll(FOCUSABLE_SELECTOR)).filter(
@@ -112,6 +120,9 @@ function fillProductModal(card) {
 	const title = card.querySelector(".product-card-title")?.textContent?.trim() ?? "";
 	const price = card.querySelector(".product-card-price")?.textContent?.trim() ?? "";
 	const image = card.querySelector("img");
+
+	// Capture which bouquet this modal stands for (stamped on the card at render time).
+	selectedBouquetId = card.dataset.bouquetId ? Number(card.dataset.bouquetId) : null;
 
 	productTitleRef.textContent = title;
 	productPriceRef.textContent = price;
@@ -233,7 +244,8 @@ document.addEventListener("click", (event) => {
 		// Buy now sits inside the product modal, so block the leap to the
 		// order modal when quantity is 0/empty/negative — same gate as the
 		// order-form submit.
-		if (openTrigger.classList.contains("product-modal-buy") && !isQuantityValid()) {
+		const isBuyNow = openTrigger.classList.contains("product-modal-buy");
+		if (isBuyNow && !isQuantityValid()) {
 			const message = quantityRef.value.trim()
 				? "Quantity must be greater than 0"
 				: "Please enter a quantity";
@@ -242,6 +254,15 @@ document.addEventListener("click", (event) => {
 			return;
 		}
 		const targetId = openTrigger.getAttribute("data-open-modal");
+		if (isBuyNow) {
+			// Carry the chosen quantity into the order (the bouquet id was already
+			// captured when the product modal opened).
+			selectedQuantity = Number.parseInt(quantityRef?.value, 10) || 1;
+		} else if (targetId === "order-modal") {
+			// Order opened on its own (not from a bouquet) — no bouquet to tie it to.
+			selectedBouquetId = null;
+			selectedQuantity = 1;
+		}
 		const targetRef = document.getElementById(targetId);
 		openModal(targetRef, openTrigger);
 	}
@@ -329,8 +350,12 @@ if (orderFormRef) {
 		});
 	});
 
-	orderFormRef.addEventListener("submit", (event) => {
+	let isSubmitting = false;
+	const submitButton = orderFormRef.querySelector("button[type='submit']");
+
+	orderFormRef.addEventListener("submit", async (event) => {
 		event.preventDefault();
+		if (isSubmitting) return;
 
 		let firstInvalid = null;
 		validatable.forEach((field) => {
@@ -347,13 +372,39 @@ if (orderFormRef) {
 
 		const formData = new FormData(orderFormRef);
 		const data = Object.fromEntries(formData.entries());
-		const name = (data.name || "").toString().trim();
-		const phone = (data.phone || "").toString().trim();
+		const payload = {
+			name: (data.name || "").toString().trim(),
+			phone: (data.phone || "").toString().trim(),
+			address: (data.address || "").toString().trim(),
+			message: (data.message || "").toString().trim(),
+			quantity: selectedQuantity,
+			bouquetId: selectedBouquetId,
+		};
 
-		alert(`Thank you, ${name}! We'll call you at ${phone} shortly.`);
+		// Lock the form while the request is in flight to block double submits.
+		isSubmitting = true;
+		const defaultLabel = submitButton?.textContent;
+		if (submitButton) {
+			submitButton.disabled = true;
+			submitButton.classList.add("is-loading");
+			submitButton.textContent = "Sending...";
+		}
 
-		orderFormRef.reset();
-		validatable.forEach((field) => clearFieldError(field));
-		closeModal();
+		try {
+			await apiClient.post("/orders", payload);
+			showSuccessNotification(`Thank you, ${payload.name}! We'll call you at ${payload.phone} shortly.`);
+			orderFormRef.reset();
+			validatable.forEach((field) => clearFieldError(field));
+			closeModal();
+		} catch (error) {
+			showErrorNotification(extractErrorMessage(error, "Could not place your order. Please try again."));
+		} finally {
+			isSubmitting = false;
+			if (submitButton) {
+				submitButton.disabled = false;
+				submitButton.classList.remove("is-loading");
+				submitButton.textContent = defaultLabel;
+			}
+		}
 	});
 }

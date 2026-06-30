@@ -1,6 +1,8 @@
 export function extractErrorMessage(error, fallbackMessage = "Something went wrong. Please try again later.") {
-	const serverMessage = error.response?.data?.error;
-	if (typeof serverMessage === "string") {
+	// Flora's backend reports errors as { status, message }. Older mocks used
+	// { error }, so we accept either shape to stay resilient.
+	const serverMessage = error.response?.data?.message ?? error.response?.data?.error;
+	if (typeof serverMessage === "string" && serverMessage.length > 0) {
 		return serverMessage;
 	}
 	if (error.message) {

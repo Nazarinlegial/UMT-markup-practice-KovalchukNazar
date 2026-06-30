@@ -1,8 +1,8 @@
 /* ================================ */
-/* Shared infra: loaders, notifications, pagination overrides */
+/* Shared plumbing: spinners, toasts and pagination overrides */
 /* ================================ */
 
-/* Loader */
+/* Loading spinners */
 
 .content-loader {
 	display: flex;
@@ -51,7 +51,7 @@
 	}
 }
 
-/* Notifications */
+/* Toast notifications */
 
 #notification-root {
 	position: fixed;
@@ -79,8 +79,12 @@
 	border-color: #d64545;
 }
 
+.notification--success {
+	border-color: #3a8a3a;
+}
+
 /* ================================ */
-/* Bouquets — drop the hardcoded grid heights so 100 items can flow */
+/* Bouquets — scrap the fixed grid heights so 100 items can flow */
 /* ================================ */
 
 .bouquets-list-shell {
@@ -95,9 +99,9 @@
 	display: none;
 }
 
-/* End-of-collection message — shown once Show More has loaded the last
-   chunk. Matches the section's body copy size and stays muted so it reads
-   as a status note, not a feature. */
+/* End-of-list note — appears once Show More pulls the final chunk. It
+   matches the section body size and stays muted so it reads like a status
+   line, not a feature. */
 .bouquets-end-message {
 	margin-top: 16px;
 	font-size: var(--font-regular);
@@ -111,28 +115,28 @@
 	display: none;
 }
 
-/* `display: inline-flex` on .primary-button overrides the browser-default
-   [hidden] { display: none } rule. Bring the default back so toggling the
-   `hidden` attribute on Show More (and any other primary button) works. */
+/* `display: inline-flex` on .primary-button overrides the browser's default
+   [hidden] { display: none }. Restore it so flipping the `hidden` attribute
+   on Show More (and every other primary button) actually hides the element. */
 .primary-button[hidden] {
 	display: none !important;
 }
 
-/* Override the static-height grids from styles.css — those were sized
-   for exactly 8 cards. The API-backed catalogue can render any count.
-   On mobile rows auto-fit (Figma has variable 419/440 px there); on
-   tablet/desktop the row height is pinned to the Figma spec so the
-   layout doesn't drift when Show More appends more cards. */
+/* Cancel the fixed-height grids from styles.css — those were cut for
+   exactly 8 cards, but the API catalogue can render any number. Mobile
+   rows auto-fit (Figma uses variable 419/440 px there); tablet/desktop pin
+   the row height to the Figma spec so the layout holds steady as Show More
+   appends more cards. */
 .bouquets-list {
 	height: auto !important;
 	overflow: visible !important;
 	grid-template-rows: none !important;
 }
 
-/* Equal-height cards: every .bouquets-item stretches to its grid row,
-   .product-card fills it, and the price gets pinned to the bottom of
-   .product-card-content so all four prices in a row align horizontally
-   even when their descriptions are different lengths. */
+/* Equal-height cards: each .bouquets-item stretches to its grid row, the
+   .product-card fills it, and the price is pinned to the bottom of
+   .product-card-content — so every price in a row lines up even when the
+   descriptions run to different lengths. */
 .bouquets-item {
 	align-self: stretch;
 }
@@ -141,17 +145,17 @@
 	height: 100%;
 }
 
-/* Lock the bouquet image to its design size — without this the flex
-   layout shrinks it when the card content (long descriptions) tries to
-   take more space than the grid row allows. */
+/* Hold the bouquet image at its design size — otherwise the flex layout
+   shrinks it when the card content (long descriptions) wants more room
+   than the grid row allows. */
 .bouquets-item .bouquets-card-image {
 	flex-shrink: 0;
 }
 
-/* On mobile each row stacks naturally — keep the content flowing right
-   after the image with no extra empty space. On tablet/desktop several
-   cards share a row and may have different description lengths, so we
-   stretch content + pin price to the bottom so all four prices align. */
+/* On mobile each row stacks on its own, so the content sits right under
+   the image with no gap. On tablet/desktop several cards share a row and
+   their descriptions may differ in length, so we stretch the content and
+   pin the price to the bottom to keep all prices aligned. */
 @media (min-width: 768px) {
 	.bouquets-item .product-card-content {
 		flex: 1;
@@ -163,9 +167,9 @@
 	}
 }
 
-/* Reserve exactly two lines of text height for every bestsellers card so
-   short descriptions don't pull the price up — keeps prices on a single
-   baseline across the row without touching the Figma layout. */
+/* Hold two lines of text height on every bestsellers card so a short
+   description can't drag the price upward — this keeps every price on the
+   same baseline across the row without disturbing the Figma layout. */
 .bestsellers-item .product-card-text {
 	display: -webkit-box;
 	-webkit-line-clamp: 2;
@@ -174,10 +178,10 @@
 	min-height: calc(1.5em * 2);
 }
 
-/* Figma title height differs per breakpoint — mobile 103, tablet 76, the
-   same on desktop. styles.css only sets the mobile value, so tablet+
-   inherit it (and section ends up 27 px taller than the Figma spec).
-   Reset to the Figma value from 768 up. */
+/* The Figma title height changes per breakpoint — mobile 103, tablet 76,
+   same on desktop. styles.css only defines the mobile value, so tablet and
+   up inherit it (leaving the section 27 px taller than the Figma spec).
+   Restore the Figma value from 768 up. */
 @media (min-width: 768px) {
 	.bouquets-title {
 		height: 76px;
@@ -191,12 +195,12 @@
 }
 
 /* ================================ */
-/* Bestsellers + feedback — custom pagination dots                  */
-/* The dot list is rendered dynamically; mark active dot via JS by  */
-/* toggling .is-active on the parent <li>. The legacy CSS rule      */
+/* Bestsellers + feedback — bespoke pagination dots                 */
+/* The dot list is built at runtime; JS marks the active dot by       */
+/* toggling .is-active on the parent <li>. The old CSS rule below    */
 /* `.bestsellers-dots li:first-child .bestsellers-dot { opacity: 1 }` */
-/* would always highlight the first dot — we neutralise it so the    */
-/* active-class rule wins.                                           */
+/* would always light up the first dot — we cancel it so the         */
+/* active-class rule takes effect.                                    */
 /* ================================ */
 
 .bestsellers-dots li .bestsellers-dot {
@@ -217,9 +221,9 @@
 	cursor: not-allowed;
 }
 
-/* Mobile testimonial cards have no fixed height in styles.css — different
-   quote lengths produce different card sizes. Lock to the Figma spec so
-   every card is 335 × 228 (tablet/desktop already have 228 set). */
+/* Mobile testimonial cards have no fixed height in styles.css, so quotes
+   of different lengths make the cards different sizes. Pin them to the
+   Figma spec so each card is 335 × 228 (tablet/desktop already use 228). */
 @media (max-width: 767px) {
 	.feedback-item {
 		height: 228px;
@@ -229,9 +233,9 @@
 	}
 }
 
-/* Long quotes can push the author below the fixed 228 px card height on
-   any breakpoint. Clamp the quote to 3 lines everywhere so the author
-   always stays inside the card and the layout stays consistent. */
+/* A long quote can shove the author past the fixed 228 px card height on
+   any breakpoint. Clamp the quote to 3 lines throughout so the author
+   always fits inside the card and the layout stays steady. */
 .feedback-item .feedback-quote-text {
 	display: -webkit-box;
 	-webkit-line-clamp: 3;
@@ -239,22 +243,22 @@
 	overflow: hidden;
 }
 
-/* Pin the author to the bottom of the card regardless of how long the
-   quote ends up — keeps every author on the same baseline (matches the
-   Figma testimonial layout). */
+/* Anchor the author to the bottom of the card no matter how long the
+   quote turns out — this keeps every author on the same baseline
+   (matching the Figma testimonial layout). */
 .feedback-author {
 	margin-top: auto;
 }
 
 /* ================================ */
-/* Click cooldown                                                   */
+/* Post-click cooldown                                              */
 /* ================================ */
-/* `.click-cooldown` is added by js/button-cooldown.js right after a
-   click. While it's present we neutralise the lingering hover/focus
-   visual change (CSS keeps :hover until the pointer moves off, plus
-   the browser may keep :focus-visible after a mouse click). Native
-   :active feedback during mousedown is left alone — only the
-   afterwards-sticky styles are reset. */
+/* js/button-cooldown.js slaps `.click-cooldown` on an element right after
+   a click. While it's there we cancel the sticky hover/focus styling (CSS
+   holds :hover until the pointer leaves, and the browser may keep
+   :focus-visible after a mouse click). Native :active feedback during the
+   mousedown is untouched — only the styles that linger afterwards are
+   reset. */
 
 .primary-button.click-cooldown:hover,
 .primary-button.click-cooldown:focus,
@@ -269,8 +273,7 @@
 	border-color: var(--border-color-subtle);
 }
 
-/* Keep dynamically rendered feedback cards from collapsing when only
-   one is present at the mobile breakpoint — the legacy nth-child
-   display:none rules are scoped to additional children, so a single
-   card always shows. Nothing to override here, but document the
-   assumption for future maintenance. */
+/* Stop dynamically rendered feedback cards from collapsing when only one
+   is shown at the mobile breakpoint — the old nth-child display:none rules
+   target extra children, so a lone card always stays visible. Nothing to
+   override here; this just records the assumption for future upkeep. */
