@@ -5,7 +5,26 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "vite",
+    "preview": "vite preview",
+    "preview:app": "GITHUB_ACTIONS=true GITHUB_REPOSITORY=nazarinlegial/UMT-markup-practice-KovalchukNazar VITE_API_MODE=static sh -c 'vite build && vite preview'",
+    "build": "vite build",
+    "server": "json-server db.json --port 4001"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:nazarinlegial/UMT-markup-practice-KovalchukNazar.git"
+  },
+  "keywords": [],
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.18.1",
+    "json-server": "^1.0.0-beta.15",
+    "vite": "^8.0.12"
+  },
+  "devDependencies": {
+    "vite-plugin-static-copy": "^4.1.0"
   },
   "private": true
 }

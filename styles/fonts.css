@@ -29,4 +29,13 @@
 	--font-price-desktop: 20px;
 	--font-heading-desktop: 48px;
 	--font-hero-title-desktop: 56px;
+
+	/* Modal typography — locked across breakpoints (Figma design tokens) */
+	--font-modal-heading: 32px; /* Hanuman 400 / line-height 38.4 / ls -0.01em — Heading on Product Details */
+	--font-modal-price: 20px; /* Hanuman 400 / line-height 28 / ls -0.01em — Price text */
+	--font-modal-text: 14px; /* Roboto 400 / line-height 21 — description text */
+	--font-modal-input: 16px; /* Roboto 400 / line-height 24 — "Text Sizes / Text Regular" — inputs and quantity */
+	--font-modal-label: 16px; /* Roboto 400 / line-height 24 — input labels */
+	--font-modal-title: 34px; /* Hanuman 400 — Order modal title (matches --font-heading-section) */
+	--font-modal-title-line-height: 41px; /* Figma frame bbox = 41 (rounded up from 34×1.2 = 40.8) */
 }

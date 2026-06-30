@@ -2,8 +2,13 @@
 @import "./colors.css";
 @import "./fonts.css";
 
-/* Freeze page scrolling while the mobile drawer is expanded */
-html:has(body.menu-open) {
+/* Freeze page scrolling while the mobile drawer or any modal is open */
+html:has(body.menu-open),
+html:has(body.modal-open) {
+	overflow: hidden;
+}
+
+body.modal-open {
 	overflow: hidden;
 }
 
@@ -72,9 +77,9 @@ body {
 	padding: 8px 20px;
 	cursor: pointer;
 	transition:
-		opacity 250ms ease-in-out,
-		background 250ms ease-in-out,
-		color 250ms ease-in-out;
+		opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
+		background 250ms cubic-bezier(0.4, 0, 0.2, 1),
+		color 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .primary-button:hover,
@@ -100,7 +105,7 @@ body {
 /* Text links reused across nav, footer menu and contact details */
 
 .general-link {
-	transition: opacity 250ms ease-in-out;
+	transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .general-link:hover,
@@ -212,12 +217,12 @@ body {
 
 .menu-icon__close {
 	opacity: 0;
-	transition: opacity 250ms ease-in-out;
+	transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .menu-icon__burger {
 	opacity: 1;
-	transition: opacity 250ms ease-in-out;
+	transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .menu-button.is-open .menu-icon__close {
@@ -249,7 +254,7 @@ body {
 	overflow-y: auto;
 	background-color: var(--mobile-menu-bg);
 	gap: 24px;
-	transition: transform 250ms ease-in-out;
+	transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 body.menu-open .header {
@@ -298,7 +303,7 @@ body.menu-open .header {
 	width: 100%;
 	height: 510px;
 	background-color: #d9d9d9;
-	background-image: url("../images/hero-bg.jpg");
+	background-image: url("/images/hero-bg@1x.jpg");
 	background-repeat: no-repeat;
 	background-position: 53% 50%;
 	background-size: cover;
@@ -306,6 +311,12 @@ body.menu-open .header {
 	align-items: center;
 	position: relative;
 	overflow: hidden;
+}
+
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+	.hero {
+		background-image: url("/images/hero-bg@2x.jpg");
+	}
 }
 
 .hero-container {
@@ -418,6 +429,24 @@ body.menu-open .header {
 	gap: 16px;
 }
 
+.product-card[data-product-trigger] {
+	cursor: pointer;
+	border-radius: 16px;
+	transition:
+		transform 250ms cubic-bezier(0.4, 0, 0.2, 1),
+		box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card[data-product-trigger]:hover,
+.product-card[data-product-trigger]:focus-visible {
+	transform: translateY(-4px);
+	outline: none;
+}
+
+.product-card[data-product-trigger]:focus-visible {
+	box-shadow: 0 0 0 2px var(--border-color);
+}
+
 .product-card-content {
 	display: flex;
 	flex-direction: column;
@@ -524,9 +553,9 @@ body.menu-open .header {
 	opacity: 0.2;
 }
 
-.bestsellers-dots li:first-child .bestsellers-dot {
-	opacity: 1;
-}
+/* JS flips .is-active on the parent <li> to highlight the current dot
+   (the styling itself lives in styles/shared.css under
+   .bestsellers-dots li.is-active .bestsellers-dot). */
 
 .bestsellers-nav {
 	display: flex;
@@ -550,9 +579,9 @@ body.menu-open .header {
 	cursor: pointer;
 	flex-shrink: 0;
 	transition:
-		background-color 250ms ease-in-out,
-		border-color 250ms ease-in-out,
-		opacity 250ms ease-in-out;
+		background-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
+		border-color 250ms cubic-bezier(0.4, 0, 0.2, 1),
+		opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .slider-nav-icon {
@@ -589,18 +618,18 @@ body.menu-open .header {
 /* ================================ */
 
 .bouquets {
-	padding: 0 0 64px 0;
+	padding: 64px 20px;
 	background-color: var(--primary-bg);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 0;
+	gap: 40px;
 }
 
 .bouquets-container {
 	display: flex;
 	flex-direction: column;
-	padding: 64px 0 40px 0;
+	padding: 0;
 	gap: 32px;
 	width: 100%;
 }
@@ -620,20 +649,20 @@ body.menu-open .header {
 	flex-direction: column;
 	gap: 8px;
 	max-width: 100%;
+	height: 103px;
 	text-align: center;
 	align-items: center;
 	align-self: center;
 }
 
 .bouquets-list {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: 1fr;
 	gap: 24px;
-	row-gap: 24px;
 }
 
 .bouquets-item {
-	flex-basis: 100%;
+	width: 100%;
 }
 
 .bouquets-item .product-card {
@@ -848,6 +877,308 @@ body.menu-open .header {
 }
 
 /* ================================ */
+/* Modal overlay and window — shared mobile baseline */
+/* ================================ */
+
+.modal-backdrop {
+	position: fixed;
+	inset: 0;
+	z-index: 100;
+	display: flex;
+	justify-content: center;
+	align-items: flex-start;
+	padding: 64px 20px;
+	background-color: var(--modal-overlay-bg);
+	overflow-y: auto;
+	opacity: 0;
+	visibility: hidden;
+	transition:
+		opacity 250ms cubic-bezier(0.4, 0, 0.2, 1),
+		visibility 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-backdrop.is-open {
+	opacity: 1;
+	visibility: visible;
+}
+
+.modal-window {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+	width: 100%;
+	max-width: 335px;
+	padding: 56px 20px;
+	background-color: var(--modal-bg);
+	border-radius: 16px;
+	transform: translateY(16px);
+	transition: transform 250ms cubic-bezier(0.4, 0, 0.2, 1);
+	flex-shrink: 0;
+}
+
+.modal-backdrop.is-open .modal-window {
+	transform: translateY(0);
+}
+
+.modal-close {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	width: 32px;
+	height: 32px;
+	padding: 0;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background-color: transparent;
+	border: none;
+	border-radius: 50%;
+	color: var(--primary-text);
+	cursor: pointer;
+	transition: opacity 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-close:hover,
+.modal-close:focus-visible {
+	opacity: 0.6;
+	outline: none;
+}
+
+.modal-close-icon {
+	/*
+	 * The #close sprite has a 0 0 24 24 viewBox and its X path only fills
+	 * about 64% of it (4.29 to 19.71). Sizing the svg to 22px lands the
+	 * visible cross at roughly 14x14 inside the 32px button
+	 * (14 / 0.6425 ~= 21.79). The burger icon lives on its own .menu-icon
+	 * svg, so this scaling never touches it.
+	 */
+	width: 22px;
+	height: 22px;
+	fill: var(--primary-text);
+}
+
+/* Inputs and labels reused across the order form */
+
+.modal-form {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.modal-field {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.modal-field-label {
+	font-size: var(--font-modal-label);
+	line-height: 150%;
+	color: var(--primary-text);
+}
+
+.modal-field-input,
+.modal-field-textarea {
+	width: 100%;
+	font-family: inherit;
+	font-size: var(--font-modal-input);
+	line-height: 150%;
+	color: var(--primary-text);
+	background-color: transparent;
+	border: 1px solid var(--modal-input-border);
+	border-radius: 12px;
+	transition: border-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.modal-field-input {
+	height: 40px;
+	/* Figma spec: 8/12/8/12 padding for the one-line text input */
+	padding: 8px 12px;
+}
+
+.modal-field-textarea {
+	/* Figma spec: the textarea gets an even 12px padding, unlike the input */
+	height: 120px;
+	padding: 12px;
+	resize: none;
+}
+
+.modal-field-input::placeholder,
+.modal-field-textarea::placeholder {
+	color: var(--modal-input-placeholder);
+}
+
+.modal-field-input:hover,
+.modal-field-input:focus-visible,
+.modal-field-textarea:hover,
+.modal-field-textarea:focus-visible {
+	border-color: var(--modal-input-border-focus);
+	outline: none;
+}
+
+.modal-field-input.is-error,
+.modal-field-textarea.is-error {
+	border-color: var(--modal-input-border-error);
+	color: var(--modal-input-error-text);
+}
+
+.modal-field-input.is-error::placeholder,
+.modal-field-textarea.is-error::placeholder {
+	color: var(--modal-input-error-text);
+}
+
+.modal-field-error {
+	margin-top: 6px;
+	font-size: 12px;
+	line-height: 18px;
+	color: var(--modal-input-error-text);
+}
+
+.modal-field-error[hidden] {
+	display: none;
+}
+
+/* ================================ */
+/* Order / checkout form — mobile baseline */
+/* ================================ */
+
+.order-modal-title {
+	font-family: "Hanuman", serif;
+	font-weight: 400;
+	font-size: var(--font-modal-title);
+	line-height: var(--font-modal-title-line-height);
+	letter-spacing: -0.01em;
+	text-align: center;
+}
+
+.order-modal-submit {
+	align-self: stretch;
+	height: 44px;
+	padding: 10px 24px;
+}
+
+/* ================================ */
+/* Product details dialog — mobile baseline */
+/* ================================ */
+
+.product-modal-content {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.product-modal-image {
+	display: block;
+	width: 100%;
+	height: auto;
+	aspect-ratio: 295 / 314.67;
+	max-height: none;
+	border-radius: 16px;
+	object-fit: cover;
+}
+
+.product-modal-info {
+	display: flex;
+	flex-direction: column;
+	gap: 24px;
+}
+
+.product-modal-title {
+	font-family: "Hanuman", serif;
+	font-weight: 400;
+	font-size: var(--font-modal-heading);
+	line-height: 120%;
+	letter-spacing: -0.01em;
+	color: var(--primary-text);
+}
+
+.product-modal-price-row {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.product-modal-price {
+	font-family: "Hanuman", serif;
+	font-weight: 400;
+	font-size: var(--font-modal-price);
+	line-height: 140%;
+	letter-spacing: -0.01em;
+	color: var(--primary-text);
+}
+
+.product-modal-price-divider {
+	flex: 1 1 auto;
+	height: 28px;
+	border-left: 1px solid var(--modal-divider);
+}
+
+.product-modal-text {
+	font-size: var(--font-modal-text);
+	line-height: 150%;
+	color: var(--primary-text);
+}
+
+.product-modal-actions {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	height: 44px;
+	margin-top: 8px;
+	/* Positioning anchor for the quantity error: it floats beneath the
+		   row, so showing or hiding it never shoves the rest of the modal
+		   content up or down. */
+	position: relative;
+}
+
+.product-modal-buy {
+	flex: 0 0 215px;
+	width: 215px;
+	height: 44px;
+}
+
+.product-modal-quantity {
+	flex: 0 0 64px;
+	width: 64px;
+	height: 40px;
+	padding: 8px 12px;
+	text-align: left;
+	font-family: inherit;
+	font-size: var(--font-modal-input);
+	line-height: 150%;
+	color: var(--primary-text);
+	background-color: transparent;
+	border: 1px solid var(--modal-input-border);
+	border-radius: 12px;
+	transition: border-color 250ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-modal-quantity:hover,
+.product-modal-quantity:focus-visible {
+	border-color: var(--modal-input-border-focus);
+	outline: none;
+}
+
+.product-modal-quantity.is-error {
+	border-color: var(--modal-input-border-error);
+	color: var(--modal-input-error-text);
+}
+
+/* Absolutely positioned under the actions row, so flipping its visibility
+   can't move the surrounding modal text. Right-aligned so it lines up under
+   the quantity input on the right of the row. */
+.product-modal-quantity-error {
+	position: absolute;
+	top: calc(100% + 6px);
+	right: 0;
+	margin: 0;
+	display: block;
+	text-align: right;
+	white-space: nowrap;
+}
+
+/* ================================ */
 /* Footer — mobile baseline */
 /* ================================ */
 
@@ -972,7 +1303,7 @@ body.menu-open .header {
 		padding: 0 32px;
 	}
 
-	/* Header tweaks */
+	/* Header layout tweaks */
 	.header {
 		height: 72px;
 		padding: 0 32px;
@@ -1026,10 +1357,9 @@ body.menu-open .header {
 		display: none;
 	}
 
-	/* Hero layout on tablet */
+	/* Hero layout tweaks */
 	.hero {
 		min-height: 669px;
-		background-image: url("../images/hero-bg.jpg");
 		background-position: 61% 50%;
 	}
 
@@ -1065,7 +1395,7 @@ body.menu-open .header {
 		width: 215px;
 	}
 
-	/* About layout on tablet */
+	/* About layout tweaks */
 	.about {
 		padding: 64px 32px;
 	}
@@ -1093,7 +1423,7 @@ body.menu-open .header {
 		height: 428px;
 	}
 
-	/* Bestsellers layout on tablet */
+	/* Bestsellers layout tweaks */
 	.bestsellers {
 		padding: 64px 32px;
 	}
@@ -1135,10 +1465,10 @@ body.menu-open .header {
 		height: 320px;
 	}
 
-	/* Bouquet grid on tablet */
+	/* Bouquet grid tweaks */
 	.bouquets {
-		height: 2092px;
-		padding: 64px 32px 64px 32px;
+		box-sizing: border-box;
+		padding: 64px 32px;
 		gap: 40px;
 	}
 
@@ -1156,12 +1486,12 @@ body.menu-open .header {
 	}
 
 	.bouquets-list {
+		grid-template-columns: repeat(2, 1fr);
 		gap: 24px;
-		row-gap: 24px;
 	}
 
 	.bouquets-item {
-		flex-basis: calc((100% - 24px) / 2);
+		width: 100%;
 	}
 
 	.bouquets-card-image {
@@ -1176,7 +1506,7 @@ body.menu-open .header {
 		min-width: 0;
 	}
 
-	/* Testimonials on tablet */
+	/* Testimonials tweaks */
 	.feedback {
 		height: 509px;
 		padding: 64px 32px;
@@ -1213,7 +1543,7 @@ body.menu-open .header {
 		align-self: flex-end;
 	}
 
-	/* Contacts on tablet */
+	/* Contacts tweaks */
 	.contacts {
 		height: 715px;
 		padding: 64px 32px;
@@ -1300,6 +1630,56 @@ body.menu-open .header {
 		width: 24px;
 		height: 24px;
 	}
+
+	/* Modal dialogs — tablet */
+	.modal-backdrop {
+		padding: 64px 32px;
+		align-items: center;
+	}
+
+	.modal-window {
+		max-width: 704px;
+		padding: 32px;
+		gap: 48px;
+	}
+
+	/* Order / checkout form — tablet */
+	.order-modal-submit {
+		align-self: center;
+		width: 340px;
+	}
+
+	/* Product details dialog — tablet */
+	.product-modal .modal-window {
+		/* Bump the shared 32px padding: the Product Details tablet frame in Figma
+		   wants 64px vertical / 32px horizontal. The Order modal keeps the shared
+		   32px, since its own Figma frame is symmetric. */
+		padding: 64px 32px;
+	}
+
+	.product-modal-content {
+		flex-direction: row;
+		gap: 24px;
+		align-items: flex-start;
+	}
+
+	.product-modal-image {
+		width: 308px;
+		height: auto;
+		aspect-ratio: 308 / 328.53;
+		flex-shrink: 0;
+		object-fit: cover;
+	}
+
+	.product-modal-info {
+		flex: 1 1 auto;
+		gap: 24px;
+	}
+
+	.product-modal-buy {
+		flex: 0 0 228px;
+		width: 228px;
+	}
 }
 
 /* ================================ */
@@ -1323,7 +1703,7 @@ body.menu-open .header {
 		padding: 0 80px;
 	}
 
-	/* Header on desktop */
+	/* Header layout tweaks */
 	.header {
 		height: 72px;
 		padding: 0 80px;
@@ -1384,11 +1764,10 @@ body.menu-open .header {
 		display: none;
 	}
 
-	/* Hero on desktop */
+	/* Hero layout tweaks */
 	.hero {
 		min-height: 669px;
 		height: 669px;
-		background-image: url("../images/hero-bg.jpg");
 		background-position: center center;
 	}
 
@@ -1425,7 +1804,7 @@ body.menu-open .header {
 		width: 215px;
 	}
 
-	/* About on desktop */
+	/* About layout tweaks */
 	.about {
 		padding: 92px 80px;
 	}
@@ -1463,7 +1842,7 @@ body.menu-open .header {
 		font-size: var(--font-heading-desktop);
 	}
 
-	/* Bestsellers on desktop */
+	/* Bestsellers layout tweaks */
 	.bestsellers {
 		padding: 92px 80px;
 	}
@@ -1511,9 +1890,9 @@ body.menu-open .header {
 		gap: 40px;
 	}
 
-	/* Bouquet grid on desktop */
+	/* Bouquet grid tweaks */
 	.bouquets {
-		height: 1337px;
+		box-sizing: border-box;
 		padding: 92px 80px 92px 80px;
 		gap: 40px;
 	}
@@ -1526,6 +1905,7 @@ body.menu-open .header {
 
 	.bouquets-title {
 		max-width: 768px;
+		height: 93px;
 	}
 
 	.bouquets .section-title {
@@ -1538,12 +1918,13 @@ body.menu-open .header {
 	}
 
 	.bouquets-list {
-		gap: 32px;
+		grid-template-columns: repeat(4, 1fr);
+		column-gap: 32px;
 		row-gap: 64px;
 	}
 
 	.bouquets-item {
-		flex-basis: calc((100% - 32px * 3) / 4);
+		width: 100%;
 	}
 
 	.bouquets-card-image {
@@ -1559,7 +1940,7 @@ body.menu-open .header {
 		padding: 0 24px;
 	}
 
-	/* Testimonials on desktop */
+	/* Testimonials tweaks */
 	.feedback {
 		height: 582px;
 		padding: 92px 80px;
@@ -1599,7 +1980,7 @@ body.menu-open .header {
 		align-self: flex-end;
 	}
 
-	/* Contacts on desktop */
+	/* Contacts tweaks */
 	.contacts {
 		height: 1090px;
 		padding: 92px 80px;
@@ -1715,5 +2096,74 @@ body.menu-open .header {
 
 	.footer-copyright {
 		font-size: var(--font-small-tablet);
+	}
+
+	/* Modal dialogs — desktop */
+	.modal-backdrop {
+		padding: 64px 80px;
+		align-items: center;
+	}
+
+	.modal-window {
+		max-width: 1280px;
+		padding: 64px;
+		gap: 48px;
+	}
+
+	/* Order / checkout form — desktop */
+	.order-modal .modal-window {
+		max-width: 842px;
+	}
+
+	.order-modal .modal-field-textarea {
+		/* Desktop textarea per Figma is 714 x 180 -- taller than the 120 used on
+		   mobile/tablet. Wrapped in .order-modal so it can't bleed into other
+		   modals. */
+		height: 180px;
+	}
+
+	.order-modal-submit {
+		align-self: center;
+		width: auto;
+		min-width: 159px;
+	}
+
+	/* Product details dialog — desktop */
+	.product-modal .modal-window {
+		/* Bring back symmetric 64px padding on desktop, beating the tablet rule
+		   (.product-modal .modal-window { padding: 64px 32px }) that outweighs
+		   the shared .modal-window on specificity. */
+		padding: 64px;
+	}
+
+	.product-modal-content {
+		flex-direction: row;
+		gap: 80px;
+		/* On the cross axis, stretch forces the info column to match the row
+		   height (the image's 571.72), keeping the gap under the Buy button
+		   inside the info column instead of squashing the row. */
+		align-items: stretch;
+	}
+
+	.product-modal-image {
+		width: 536px;
+		aspect-ratio: 536 / 571.73;
+		flex-shrink: 0;
+	}
+
+	.product-modal-info {
+		flex: 1 1 auto;
+		gap: 24px;
+		/* Centre the info content vertically in the 571.72px column -- mirrors
+		   the Figma `Content` frame's counterAxisAlignItems: CENTER, so the
+		   title sits about midway up the image with matching gaps above it
+		   and below the Buy button. */
+		justify-content: center;
+		align-items: stretch;
+	}
+
+	.product-modal-buy {
+		flex: 0 0 456px;
+		width: 456px;
 	}
 }
