@@ -9,7 +9,7 @@ const isUserOrOrgSite = Boolean(repo?.endsWith(".github.io"));
 const base =
 	isGitHubActions && repo && !isUserOrOrgSite ? `/${repo}/` : "/";
 
-const jsonServerTarget = "http://127.0.0.1:3001";
+const jsonServerTarget = "http://127.0.0.1:4001";
 // In static mode the catalogue reads pre-built dist/api/*.json files. Proxying
 // `/api/*` to a local json-server would shadow those static files, so we skip
 // the proxy entirely whenever VITE_API_MODE=static.
@@ -90,7 +90,7 @@ export default defineConfig({
 		port: 4000,
 		proxy: {
 			"/api": {
-				target: "http://localhost:3001",
+				target: "http://localhost:4001",
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/api/, ""),
 			},

@@ -12,15 +12,15 @@ const bouquetsLoader = document.getElementById("bouquets-loader");
 const showMoreButton = document.querySelector(".bouquets-show-more-button");
 const endMessage = document.querySelector(".bouquets-end-message");
 
-// Single source of truth for pagination state. `currentPage` is the last page
-// successfully appended to the list; `hasMore` flips to false when the server
-// reports we've reached the end (or the static-mode fallback runs out).
+// Pagination state lives in one place. `currentPage` tracks the most recent
+// page we appended to the list; `hasMore` turns false once the server says
+// we're at the end (or the static-mode cache runs dry).
 const state = {
 	currentPage: 0,
 	perPage: itemsPerPage,
 	hasMore: true,
-	// Static-mode fallback caches the full array on the first request and
-	// paginates client-side, since GitHub Pages can't honour ?_page= params.
+	// In static mode we cache the whole array on the first request and then
+	// paginate on the client, because GitHub Pages ignores ?_page= params.
 	staticCache: null,
 };
 
@@ -86,9 +86,9 @@ function appendChunk(items) {
 	}
 }
 
-// Fetch one page. Tries server-side pagination first (json-server v1 returns
-// { items, next, ... }); falls back to caching the full array and slicing
-// locally when the host ignored the query (static GitHub Pages deployment).
+// Pull a single page. We try real server-side pagination first (json-server v1
+// returns { items, next, ... }); if the host swallowed the query we fall back to
+// caching the full array and slicing it locally (static GitHub Pages deploy).
 async function fetchPage(page) {
 	if (state.staticCache) {
 		const start = (page - 1) * state.perPage;
@@ -102,16 +102,16 @@ async function fetchPage(page) {
 	});
 	const data = response.data;
 
-	// json-server v1 paginated shape:
-	//   { first, prev, next, last, pages, items: <total count>, data: [...] }
-	// `items` is the total record count, the page slice itself sits in `data`.
+	// json-server v1 pagination envelope:
+	//   { first, prev, next, last, pages, items: <count of all records>, data: [...] }
+	// Here `items` holds the total record count and the page slice lives in `data`.
 	if (data && Array.isArray(data.data)) {
 		state.hasMore = data.next != null;
 		return data.data;
 	}
 
-	// Static host returned the full array — switch to client-side mode for
-	// the rest of the session and slice from the cache.
+	// The static host handed back the full array, so switch to client-side mode
+	// for the rest of the session and slice out of the cache.
 	if (Array.isArray(data)) {
 		state.staticCache = data;
 		const start = (page - 1) * state.perPage;
@@ -120,7 +120,7 @@ async function fetchPage(page) {
 		return slice;
 	}
 
-	// Unknown shape — assume no more items rather than crash.
+	// Unrecognised shape — play it safe and treat it as "no more items".
 	state.hasMore = false;
 	return [];
 }

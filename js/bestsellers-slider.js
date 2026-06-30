@@ -45,8 +45,8 @@ function buildItemMarkup() {
 
 function fillItem(li, product) {
 	const image = li.querySelector(".bestsellers-card-image");
-	// srcset must be set before src so the browser picks the right DPR
-	// candidate up front and doesn't fetch both @1x and @2x.
+	// Assign srcset before src so the browser locks onto the correct DPR
+	// candidate straight away instead of pulling both @1x and @2x.
 	const img2x = resolveImageUrl(product.img2x);
 	if (img2x) {
 		image.setAttribute("srcset", `${img2x} 2x`);
@@ -67,8 +67,8 @@ function renderDots(totalPages) {
 	if (!dotsRef) return;
 	dotsRef.replaceChildren();
 
-	// Cap the number of dots so mobile (visibleCount=1, totalPages=15) doesn't
-	// overflow the controls row. Use a sliding window centred on currentPage.
+	// Limit how many dots render — on mobile (visibleCount=1, totalPages=15) they'd
+	// overflow the controls row. A sliding window centred on the current page.
 	const maxDots = 6;
 	const windowSize = Math.min(totalPages, maxDots);
 	let start = Math.max(0, currentPage - Math.floor(windowSize / 2));
@@ -150,7 +150,7 @@ function bindControls() {
 	}
 
 	const reRender = () => {
-		// Keep the first visible card stable across breakpoint changes.
+		// Keep the leading visible card in place when the breakpoint changes.
 		const visible = getVisibleCount();
 		const firstVisibleIndex = currentPage * visible;
 		currentPage = Math.floor(firstVisibleIndex / visible);

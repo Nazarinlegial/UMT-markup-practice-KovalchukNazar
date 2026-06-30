@@ -22,8 +22,8 @@ menuBtnRef.addEventListener("click", () => {
 	mobileMenuRef.classList.toggle("is-open");
 });
 
-// Close the menu when any in-page link inside it is clicked (nav links + CTA).
-// Delegated on the menu itself so future links picked up automatically.
+// Any in-page link clicked inside the menu (nav items + the CTA) closes it.
+// We delegate on the menu container so links added later just work.
 mobileMenuRef.addEventListener("click", (event) => {
 	const link = event.target.closest('a[href^="#"], a[href^="./#"], a[href^="/#"]');
 	if (link && mobileMenuRef.contains(link)) {

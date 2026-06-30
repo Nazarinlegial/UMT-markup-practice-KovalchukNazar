@@ -39,8 +39,8 @@ function buildItemMarkup() {
 function fillItem(li, feedback, isFirst) {
 	li.setAttribute("data-feedback-id", String(feedback.id ?? ""));
 	const text = feedback.text ?? "";
-	// Match the Figma spec: the very first testimonial is wrapped in
-	// typographic quotes (U+201C / U+201D); the rest are plain.
+	// Per the Figma spec, only the first testimonial gets wrapped in
+	// typographic quotes (U+201C / U+201D); every other one stays plain.
 	li.querySelector(".feedback-quote-text").textContent = isFirst ? `“${text}”` : text;
 
 	const author = feedback.author ?? "";

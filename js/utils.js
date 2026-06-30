@@ -20,10 +20,10 @@ export function formatPriceUsd(priceValue) {
 	return `$${numericValue}`;
 }
 
-// Resolve an image path against the deployed base URL. Pictures live in
-// /public/images/ so Vite copies them as-is (no hashing) — that means we
-// don't need any module-level glob and the browser only fetches the
-// specific @1x or @2x file the <img srcset> picks for its DPR.
+// Resolve an image path against the deployed base URL. Images sit in
+// /public/images/, so Vite ships them verbatim (no content hashing) — no
+// module-level glob is needed, and the browser only ever pulls the single
+// @1x or @2x file that the <img srcset> selects for its DPR.
 const BASE = import.meta.env.BASE_URL || "/";
 
 export function resolveImageUrl(rawPath) {
@@ -37,8 +37,8 @@ export function resolveImageUrl(rawPath) {
 	return BASE + cleaned;
 }
 
-// Drop focus after a click so the button doesn't keep its :focus-visible
-// outline. Hover/active animations remain native — we only clear focus.
+// Blur the button after a click so it doesn't hold onto its :focus-visible
+// ring. Hover and active animations stay native — we only strip focus.
 export function suppressHoverUntilLeave(button) {
 	if (!button) return;
 	button.blur();
